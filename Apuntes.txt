@@ -1,0 +1,23 @@
+XAMPP
+
+mysql  -u  root  -p
+
+-u y -p son parámetros que usamos para añadir configuraciones al arranque de un proceso
+
+-u: user 
+-p: password
+
+si se pone doble guión hay que poner el nombre del parámetro entero.
+--user ; --password
+
+Para acceder a mysql en la consola tenemos que situarnos dentro de la carpeta mysql\bin el comando sería:
+cd C:\xampp\mysql\bin
+Después de esa sentencia, ejecutaríamos: mysql -u root -p.
+
+CREATE DATABASE [name];
+SHOW DATABASES;
+USE [database];
+CREATE TABLE [tableName];
+DECRIBE [tableName]; -> Nos muestra los elementos de la tabla.
+INSERT INTO [tableName] (c1, c2, c3,...)
+	VALUES(val1, val2, val3, ...);
