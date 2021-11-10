@@ -69,6 +69,10 @@ CREATE TABLE profesores(
     PRIMARY KEY(id_prof)
 );
 
+-- La especialidad es una enumeración, por lo que lo cambiamos con el siguiente comando --
+ALTER TABLE profesores
+CHANGE especialidad especialidad ENUM("bases de datos", "sistemas operativos", "desarrollo web", "redes y sistemas", "leyes", "hardware") NOT NULL AFTER ap1_prof;
+
 -- Hacemos un DESCRIBE para ver las tablas --
 DESCRIBE alumnos;
 DESCRIBE profesores;
@@ -142,7 +146,7 @@ SELECT * FROM alumnos;
 INSERT INTO profesores (nom_prof, ap1_prof, especialidad, email_prof) VALUES
 ("Manuel", "Rico", "bases de datos", "manuel@gmail.com"),
 ("Begoña", "Cambeiro", "hardware", "begoña@gmail.com"),
-("Jose Antonio", "Pereira", "Redes", "jose@gmail.com"),
+("Jose Antonio", "Pereira", "redes y sistemas", "jose@gmail.com"),
 ("Xabi", "Pérez", "sistemas operativos", "xabi@gmail.com"),
 ("Mónica", "Pérez", "desarrollo web", "monica@gmail.com"),
 ("Jesús", "Varela", "leyes", "jesus@gmail.com");

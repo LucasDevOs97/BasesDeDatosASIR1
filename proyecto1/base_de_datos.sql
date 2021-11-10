@@ -1,3 +1,6 @@
+-- Situarnos en la carpeta bin de mysql para poder acceder a mysql --
+ cd C:\xampp\mysql\bin
+
 -- Entrar en el servidor --
 mysql -u root -p
 
