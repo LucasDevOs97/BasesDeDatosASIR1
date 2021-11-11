@@ -146,11 +146,21 @@ SELECT * FROM alumnos;
 INSERT INTO profesores (nom_prof, ap1_prof, especialidad, email_prof) VALUES
 ("Manuel", "Rico", "bases de datos", "manuel@gmail.com"),
 ("Begoña", "Cambeiro", "hardware", "begoña@gmail.com"),
-("Jose Antonio", "Pereira", "redes y sistemas", "jose@gmail.com"),
+("Jose Antonio", "Pereira", "", "jose@gmail.com"),
 ("Xabi", "Pérez", "sistemas operativos", "xabi@gmail.com"),
 ("Mónica", "Pérez", "desarrollo web", "monica@gmail.com"),
 ("Jesús", "Varela", "leyes", "jesus@gmail.com");
 
+
+-- Hago un update porque guardé mal el nombre del profesor Xabier y a Jose Antonio no le puse especialidad --
+
+UPDATE profesores
+SET nom_prof = "Xabier"
+WHERE especialidad = "sistemas operativos";
+
+UPDATE profesores 
+SET especialidad = "redes y sistemas"
+WHERE nom_prof = "Jose Antonio";
 
  /*2. Cambia los emails para que ningún alumno tenga el mismo
  email. Soluciónalo poniendo "hotmail.es" en alguno de ellos.*/
