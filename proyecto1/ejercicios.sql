@@ -280,6 +280,17 @@ UPDATE alumnos
 SET edad_al = 26
 WHERE nom_al = "Diego";
 
+/*
+
+Otra forma
+
+UPDATE alumnos
+SET edad_al = [valor]
+WHERE id In([rango de ids con esa edad]);
+
+*/
+
+
  /*5. Elimina al alumno soyLerdiño. */
 
  DELETE FROM alumnos
@@ -315,6 +326,15 @@ CREATE TABLE asignaturas(
 ALTER TABLE asignaturas
 CHANGE dificultad dificultad ENUM("bajo", "medio", "alto") NOT NULL AFTER h_semana;
 
+/*
+Otra forma
+
+ALTER TABLE asignaturas
+MODIFY COLUMN dificultad ENUM("bajo", "medio", "alto") NOT NULL;
+
+*/
+
+
  /*9. Inserta un alumno con los siguientes valores:
     id=45
     nombre= "soyUn"
@@ -324,7 +344,7 @@ CHANGE dificultad dificultad ENUM("bajo", "medio", "alto") NOT NULL AFTER h_sema
     email = "soyUn@gmail.com"*/
 
 INSERT INTO alumnos (id_al, nom_al, ap1_al,ap2_al,edad_al,email_al) VALUES
-(45, "soyUn", "adelantado", "", 77, "soyUn@gmail.com");
+(45, "soyUn", "adelantado", NULL, 77, "soyUn@gmail.com");
 
  /*10. Inserta otro alumno con cualquier valor sin asignar un valor
     a la columna id. ¿Qué valor tendrá en id? ¿Cuál es la razón?*/
@@ -344,3 +364,33 @@ WHERE id_al = 45;
 
 DELETE FROM alumnos
 WHERE id_al = 46;
+
+/*
+Otra forma
+
+DELETE FROM alumnos
+WHERE id = 45 OR id = 46;
+
+No usamos el ANd porque signifia y además, en este caso sería borra al alumno que tenga el id 45 y además el id 46.
+Sin embargo con el OR es borra al alumno que tenga el id 45, si lo hay, o al que tenga el id 46, si lo hay también.
+
+*/
+
+-- Más ejemplos de lo anterior --
+
+-- Elimina a los alumnos que tengan de apellido "Vázquez" y de nombre "Diego" --
+DELETE FROM alumnos
+WHERE nom_al = "Diego" AND ap1_al = "Vázquez";
+
+-- Elimina los alumnos que tengan de apellido "Vázquez" o de nombre "Diego" --
+DELETE FROM alumnos
+WHERE nom_al = "Diego" OR ap1_al = "Vázquez";
+
+-- Elimina a los alumnos que tengan de apellido "Vázquez" y de nombre "Diego" o de email "jesus@gmail.com" --
+DELETE FROM alumnos 
+WHERE nom_al = "Diego" AND ap1_al = "Vázquez" OR email_al = "jesus@gmail.com";
+
+-- Elimina a los alumnos que tengan de apellido "Vázquez" o de nombre "Diego" y de email "jesus@gmail.com" --
+
+DELETE FROM alumnos
+WHERE nom_al = "Diego" OR ap1_al = "Vázquez" AND email_al = "jesus@gmail.com";
