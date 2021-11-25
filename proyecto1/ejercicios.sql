@@ -394,3 +394,6 @@ WHERE nom_al = "Diego" AND ap1_al = "Vázquez" OR email_al = "jesus@gmail.com";
 
 DELETE FROM alumnos
 WHERE nom_al = "Diego" OR ap1_al = "Vázquez" AND email_al = "jesus@gmail.com";
+
+-----------------------------------------------------------------------------------------------------------------
+
