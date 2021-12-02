@@ -315,3 +315,78 @@ WHERE nomBanda NOT LIKE ("Curva%");
 SELECT *
 FROM ultras
 WHERE violencia = "baja";
+
+-- Corrección --
+
+CREATE DATABASE futbolInternacional;
+
+-- Creamos primero las tablas y después hacemos las relaciones --
+
+CREATE TABLE federaciones (
+    id INT(2) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    pais VARCHAR(55) NOT NULL,
+    ligas INT(1),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE ligas (
+    id INT(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    pais VARCHAR(55) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE divisiones (
+    id INt(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    numEquipos INT(2) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE torneos (
+    id INT(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    numEquipos INT(2),
+    premio DECIMAL(11,2),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE estadios (
+    id INT(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    patrocinador VARCHAR(155),
+    olimpico ENUM("SI", "NO"),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE ultras (
+    id INT(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    violencia ENUM("BAJA", "MEDIA", "ALTA"),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE equipos (
+    id INT(3) AUTO_INCREMENT,
+    nombre VARCHAR(55) NOT NULL,
+    presupuesto DECIMAL(11,2),
+    division VARCHAR(55)  NOT NULL,
+    grupoUltra VARCHAR(55) NOT NULL,
+    estadio VARCHAR(55) NOT NULL,
+    PRIMARY KEY(id)
+);
+
+SHOW TABLES;
+
+/*
+
+recomendación: relacionar las tablas ANTES de insertar información
+
+*/
+
+ALTER TABLE torneos
+ADD COLUMN idFed INT(2),
+ADD FOREIGN KEY (idFed) 
+REFERENCES federaciones (id);
+
