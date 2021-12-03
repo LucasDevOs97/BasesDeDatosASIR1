@@ -390,3 +390,119 @@ ADD COLUMN idFed INT(2),
 ADD FOREIGN KEY (idFed) 
 REFERENCES federaciones (id);
 
+ALTER TABLE ligas
+ADD COLUMN idFed INT(2),
+ADD FOREIGN KEY (idFed)
+REFERENCES federaciones(id);
+
+ALTER TABLE divisiones
+ADD COLUMN idLiga INT(3),
+ADD FOREIGN KEY (idLiga)
+REFERENCES ligas(id);
+
+-- Creamos relación de cardinalidad N:M entre divisiones y equipos --
+
+CREATE TABLE divisionesEquipos (
+    idDivision INT(3),
+    idEquipos INT(3),
+    PRIMARY KEY (idDivision, idEquipos)
+);
+
+/*
+Podemos crear directamente la tabala divisionesEquipos con las claves foráneas
+
+CREATE TABLE divisionesEquipos (
+    idDivision INT(3),
+    idEquipos INT(3),
+    PRIMARY KEY (idDivision, idEquipos),
+    FOREIGN KEY (idDivision) REFERENCES divisiones(id),
+    FOREIGN KEY (idEquipos) REFERENCES equipos(id);
+);
+
+*/
+
+ALTER TABLE divisionesEquipos
+ADD FOREIGN KEY (idEquipos)
+REFERENCES equipos(id),
+ADD FOREIGN KEY (idDivision)
+REFERENCES divisiones(id);
+
+-- Seguimos con el resto de relaciones --
+
+/*
+La cardinalidad entre equipos y ultras es 1:1 por lo tanto podríamos crear una columna con la correspondiente FK en cualquiera
+de las dos tablas, el caso es que si nos fijamos en los inserts del enunciado, la información relativa a los ultras aparece en la 
+tabla equipos
+El siguiente problema con el que nos encontramos es que esta columna de la tabla equipos la hemos definido como VARCHAR y para
+relacionar las tablas necesitamos trabajar con los ids que son de tipo INT
+*/
+
+ALTER TABLE equipos
+CHANGE grupoUltra idGrupoUltra INT(3);
+
+ALTER TABLE equipos
+ADD FOREIGN KEY (idGrupoUltra)
+REFERENCES ultras (id);
+
+ALTER TABLE equipos
+CHANGE estadio idEstadio INT(3);
+
+ALTER TABLE equipos
+ADD FOREIGN KEY (idEstadio)
+REFERENCES estadios(id);
+
+-- INSERT federaciones --
+
+-- No se pueden hacer inserts en tablas con claves foráneas sin haber insertado antes datos en la tabla padreS --
+
+INSERT INTO federaciones (nombre, pais, ligas) VALUES
+("Federación Española", "España", 3),
+("The Football Association", "Inglaterra", 2),
+("Federazione Italiana Giuoco Calcio", "Italia", 2),
+("UEFA", NULL, NULL),
+("CONMEBOL", NULL, NULL);
+
+-- Eliminamos la columna pais de la tabla ligas porque es redundancia de datos, sabiendo la federación ya sabemos el país --
+
+ALTER TABLE ligas
+DROP COLUMN pais;
+
+INSERT INTO ligas (nombre, idFed) VALUES
+("Liga BBVA", 1),
+("Liga Santander", 1),
+("Liga Federacion", 1),
+("PREMIER", 2),
+("EFL Championship", 2),
+("Serie A TIM", 3),
+("Serie B TIM",3);
+
+INSERT INTO torneos (nombre, numEquipos, premio, idFed) VALUES
+("UEFA Champions League", 32, 100000000.00, 4),
+("European League", 64, 250000000.00, 4),
+("Libertadores", 32, 250000000.00, 5);
+-- error al ejecutar --
+
+
+INSERT INTO divisiones (nombre, numEquipos, idLiga) VALUES
+("Primera", 20, 8),
+("Segunda", 22, 9),
+("Segunda", 64, 10),
+("Premier", 20, 11),
+("First", 22, 12),
+("Serie A", 20, 13),
+("Serie B", 22, 14);
+
+-- Continuar --
+
+
+
+/*6. Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones.*/
+/*7. Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones cuyo
+nombre tenga como segunda letra "a" y penúltima letra "n".*/
+/*8.  Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones cuyo
+nombre tenga como segunda letra "a" y penúltima letra "n", o que simplemente se llame Deportivo de La Coruña.*/
+/*9. Muestra la información de los estadios que NO tengan patrocinador.*/
+/*10. Muestra la información de los estadios que tengan patrocinador.*/
+/*11. Muestra la información de las ligas que tengan 20 o 22 equipos.*/
+/*12. Muestra la información de los grupos ultras cuyo nombre NO contenga la palabra "CURVA".*/
+/*13. Muestra la información de los grupos ultras cuyo nivel de violencia sea "BAJA".*/
