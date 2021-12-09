@@ -116,14 +116,64 @@ FROM departamento;
 
 /*9. Obtener el número de empleados en cada departamento*/ 
 
-
+SELECT departamento, COUNT(departamento) 
+FROM empleados 
+GROUP BY departamento;
 
 /*10. Obtener un listado completo de empleados, incluyendo por cada empleado los datos del empleado y de su departamento*/ 
 
 
 
 /*11. Obtener un listado completo de empleados, incluyendo el nombre y apellidos del empleado junto al nombre y presupuesto de 
-su departamento. 
-*/
+su departamento. */
 
+/*12. Obtener los nombres y apellidos de los empleados que trabajan en departamentos cuyo presupuesto sea mayor de 60.000€ */ 
 
+SELECT nombre, apellidos
+FROM empleados
+WHERE departamento IN (
+    SELECT codigo
+    FROM departamento
+    WHERE presupuesto > 60000
+);
+
+/*15.  Añadir un nuevo departamento: ‘Calidad’, con presupuesto de 40.000€ y código 11. Añadir un empleado vinculado al 
+departamento recién creado: Esther Vázquez, DNI: 89267109 */
+
+INSERT INTO departamento (codigo, nombre, presupuesto) VALUES
+(11, "Calidad", 40000);
+
+INSERT INTO empleados (dni, nombre, apellidos, departamento) VALUES
+("89267109", "Esther", "Vazquez", 11);
+
+/*16.  Aplicar un recorte presupuestario del 10% a todos los departamentos*/ 
+
+-- Hacer un Update aplicando el recorte del 10% --
+
+/*17. Reasignar a los empleados del departamento de investigación (código 77) al departamento de informática (código 14)*/ 
+
+-- Hacer un update cambiando los codigos de departemento --
+
+UPDATE empleados
+SET departamento = 14
+WHERE departamento = 77;
+
+/*18. Despedir a todos los empleados que trabajan para el departamento de informática (código 14) */
+
+-- eliminar los registros de empelados cuyo departamento sea el 14 --
+
+DELETE FROM empleados
+WHERE departamento = 14;
+
+/*19. Despedir a todos los empleados que trabajen para departamentos cuyo presupuesto sea superior a los 60.000€*/ 
+
+DELETE FROM empleados
+WHERE departamento IN (
+    SELECT codigo
+    FROM departamento
+    WHERE presupuesto > 60000
+);
+
+/*20. Despedir a todos los empleados */
+
+DELETE FROM empleados;
