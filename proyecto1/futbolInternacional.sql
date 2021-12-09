@@ -280,7 +280,7 @@ nombre tenga como segunda letra "a" y penúltima letra "n", o que simplemente se
 
 SELECT *
 FROM equipos
-WHERE (presupuesto BETWEEN 50000000 AND 100000000 AND nomEquipo LIKE("%a%n%")) OR nomEquipo = "Deportivo de La Coruña";
+WHERE (presupuesto BETWEEN 50000000 AND 100000000 AND nomEquipo LIKE("_a%n_")) OR nomEquipo = "Deportivo de La Coruña";
 
 /*9. Muestra la información de los estadios que NO tengan patrocinador.*/
 
@@ -303,6 +303,13 @@ WHERE numEquiposD = 20 OR numEquiposD = 22;
 SELECT *
 FROM ligas
 WHERE idL = 1 OR idL = 2 OR idL = 4 OR idL = 5 OR idL = 6 OR idL = 7;
+
+SELECT *
+FROM ligas
+WHERE idL IN (SELECT idL
+FROM divisiones 
+WHERE numEquiposD IN (20, 22)
+);
 
 /*12. Muestra la información de los grupos ultras cuyo nombre NO contenga la palabra "CURVA".*/
 
@@ -356,7 +363,7 @@ CREATE TABLE estadios (
     id INT(3) AUTO_INCREMENT,
     nombre VARCHAR(55) NOT NULL,
     patrocinador VARCHAR(155),
-    olimpico ENUM("SI", "NO"),
+    olimpico ENUM("SI", "NO"), 
     PRIMARY KEY(id)
 );
 
@@ -451,6 +458,9 @@ ALTER TABLE equipos
 ADD FOREIGN KEY (idEstadio)
 REFERENCES estadios(id);
 
+ALTER TABLE equipos
+DROP column division;
+
 -- INSERT federaciones --
 
 -- No se pueden hacer inserts en tablas con claves foráneas sin haber insertado antes datos en la tabla padreS --
@@ -492,17 +502,79 @@ INSERT INTO divisiones (nombre, numEquipos, idLiga) VALUES
 ("Serie A", 20, 13),
 ("Serie B", 22, 14);
 
--- Continuar --
+INSERT INTO ultras (nombre, violencia) VALUES
+("Riazor Blues", "media"),
+("Boixos Nois", "alta"),
+("Yid Army", "alta"),
+("Curva Sud", "alta"),
+("Curva Nod", "alta"),
+("Hoolignas", "alta");
 
+INSERT INTO estadios (nombre, patrocinador, olimpico) VALUES
+("Riazor", "ABANCA", "N"),
+("Camp Nou", "RAKUTEN", "N"),
+("Wembley", NULL, "S"),
+("San Siro", NULL, "N"),
+("San Siro", NULL, "N"),
+("Dean Court", NULL, "N");
 
+INSERT INTO equipos (nombre, presupuesto, idGrupoUltra, idEstadio) VALUES
+("Deportivo de La Coruña", 100, 1, 1),
+("Barcelona", 100000000.00, 2, 2),
+("Milásn FC", 50000000.00, 4, 4),
+("Inter de Milán", 55000000.00, 5, 4),
+("Tottenham", 500000000.00, 3, 3),
+("Bournemouth", 50000000.00, 6, 5);
 
 /*6. Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones.*/
+
+SELECT *
+FROM equipos
+WHERE presupuesto BETWEEN 50000000 AND 100000000;
+
 /*7. Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones cuyo
 nombre tenga como segunda letra "a" y penúltima letra "n".*/
+
+SELECT *
+FROM equipos
+WHERE (presupuesto BETWEEN 50000000 AND 100000000) AND  nombre LIKE ("_a%n_");
+
 /*8.  Muestra la información de los equipos con presupuesto entre 50 millones y 100 millones cuyo
 nombre tenga como segunda letra "a" y penúltima letra "n", o que simplemente se llame Deportivo de La Coruña.*/
+
+SELECT *
+FROM equipos
+WHERE ((presupuesto BETWEEN 50000000 AND 100000000) AND  nombre LIKE ("_a%n_")) OR nombre = "Deportivo de La Coruña";
+
 /*9. Muestra la información de los estadios que NO tengan patrocinador.*/
+
+SELECT *
+FROM estadios
+WHERE patrocinador IS NULL;
+
 /*10. Muestra la información de los estadios que tengan patrocinador.*/
+
+SELECT * 
+FROM estadios
+WHERE patrocinador IS NOT NULL;
+
 /*11. Muestra la información de las ligas que tengan 20 o 22 equipos.*/
+
+SELECT *
+FROM ligas 
+WHERE id IN (SELECT idLiga
+            FROM divisiones
+            WHERE numEquipos IN(20, 22)
+);
+
 /*12. Muestra la información de los grupos ultras cuyo nombre NO contenga la palabra "CURVA".*/
+
+SELECT *
+FROM ultras 
+WHERE nombre NOT LIKE ("%Curva%");
+
 /*13. Muestra la información de los grupos ultras cuyo nivel de violencia sea "BAJA".*/
+
+SELECT *
+FROM ultras
+WHERE violencia = "baja";
