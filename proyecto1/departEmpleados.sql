@@ -1,6 +1,6 @@
 CREATE DATABASE departEmpleados;
 
-CREATE TABLE departamento (
+CREATE TABLE departamentos (
     codigo INT(2) AUTO_INCREMENT, 
     nombre VARCHAR(100),
     presupuesto INT(5),
@@ -16,9 +16,21 @@ CREATE TABLE empleados (
     PRIMARY KEY (idEmpleado)
 );
 
+-- Corección --
+
+CREATE TABLE empleados (
+id INT(8) AUTO_INCREMENT,
+nombre VARCHAR(45),
+apellidos VARCHAR(155),
+departamento INT(2),
+PRIMARY KEY(id)
+);
+
+-- Fin corrección --
+
 ALTER TABLE empleados
 ADD FOREIGN KEY (departamento)
-REFERENCES departamento (codigo);
+REFERENCES departamentos (codigo);
 
 /*
 
@@ -29,22 +41,22 @@ Al menos 2 departamentos deben tener un presupuesto mayor a 60 000 euros
 
 */
 
-INSERT INTO departamento (nombre, presupuesto) VALUES
+INSERT INTO departamentos (nombre, presupuesto) VALUES
 ("investigación", 30200),
 ("informática", 90000),
 ("finanzas", 55000), -- 2 --
 ("administración", 65000), -- 4 --
 ("marketing", 99999); -- 5 --
 
-UPDATE departamento
+UPDATE departamentos
 SET codigo = 14
 WHERE codigo = 2;
 
-UPDATE departamento
+UPDATE departamentos
 SET codigo = 77
 WHERE codigo = 1;
 
-UPDATE departamento
+UPDATE departamentos
 SET codigo = 2
 WHERE codigo = 3;
 
@@ -85,11 +97,27 @@ SELECT *
 FROM empleados
 WHERE apellidos = "Lopez";
 
+-- Corrección --
+
+SELECT *
+FROM empleados
+WHERE apellidos LIKE "%Lopez%";
+
+-- Fin corrección --
+
 /*4. Obtener todos los datos de los empleados que se apellidan ‘López’ y los que se apellidan ‘Pérez’*/
 
 SELECT *
 FROM empleados
 WHERE apellidos = "Lopez" OR apellidos = "Perez";
+
+-- Corrección --
+
+SELECT *
+FROM empleados
+WHERE apellidos LIKE "%Lopez%" OR apelldios LIKE "%Perez%";
+
+-- Fin corrección --
 
 /*5. Obtener todos los datos de los empleados que trabajan para el departamento 4 */
 
@@ -111,36 +139,50 @@ WHERE apellidos LIKE("P%");
 
 /*8. Obtener el presupuesto total de todos los departamentos*/ 
 
-SELECT SUM(presupuesto) AS "totalPresupuesto"
-FROM departamento;
+SELECT SUM(presupuesto) AS "TotalPresupuesto"
+FROM departamentos;
+
+-- Como en el alias no hemos dejado ningún espacio en blanco, podríamos no poner las comillas --
+
+SELECT SUM(presupuesto) AS TotalPresupuesto
+FROM departamentos;
 
 /*9. Obtener el número de empleados en cada departamento*/ 
 
-SELECT departamento, COUNT(departamento) 
+SELECT departamentos, COUNT(departamentos) 
 FROM empleados 
+GROUP BY departamento;
+
+-- Corrección, había entendido mal el enunciado --
+
+SELECT departamento, COUNT(*) AS numEmpleados
+FROM empleados
 GROUP BY departamento;
 
 /*10. Obtener un listado completo de empleados, incluyendo por cada empleado los datos del empleado y de su departamento*/ 
 
+-- INER JOIN --
 
 
 /*11. Obtener un listado completo de empleados, incluyendo el nombre y apellidos del empleado junto al nombre y presupuesto de 
 su departamento. */
 
+-- INER JOIN --
+
 /*12. Obtener los nombres y apellidos de los empleados que trabajan en departamentos cuyo presupuesto sea mayor de 60.000€ */ 
 
-SELECT nombre, apellidos
+SELECT nombre, apellidos, departamento
 FROM empleados
 WHERE departamento IN (
     SELECT codigo
-    FROM departamento
+    FROM departamentos
     WHERE presupuesto > 60000
 );
 
 /*15.  Añadir un nuevo departamento: ‘Calidad’, con presupuesto de 40.000€ y código 11. Añadir un empleado vinculado al 
 departamento recién creado: Esther Vázquez, DNI: 89267109 */
 
-INSERT INTO departamento (codigo, nombre, presupuesto) VALUES
+INSERT INTO departamentos (codigo, nombre, presupuesto) VALUES
 (11, "Calidad", 40000);
 
 INSERT INTO empleados (dni, nombre, apellidos, departamento) VALUES
@@ -170,7 +212,7 @@ WHERE departamento = 14;
 DELETE FROM empleados
 WHERE departamento IN (
     SELECT codigo
-    FROM departamento
+    FROM departamentos
     WHERE presupuesto > 60000
 );
 
