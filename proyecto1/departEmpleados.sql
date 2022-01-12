@@ -179,6 +179,28 @@ WHERE departamento IN (
     WHERE presupuesto > 60000
 );
 
+-- 13. Obtener los datos de los departamentos cuyo presupesto es superior al presupuesto medio --
+
+SELECT nombre
+FROM departamentos
+WHERE presupesto > (
+    SELECT AVG(presupuesto)
+    FROM departamentos
+);
+
+-- 14. Obtener los nombres de los departamentos que tienen más de dos empleados --
+
+SELECT COUNT(*), departamento
+FROM empleados
+GROUP BY departamento;
+
+SELECT COUNT(*), departamento
+FROM empleados
+GROUP BY departamento
+HAVING COUNT(*) > 2;
+
+-- utilizamos el where para filtrar datos existentes en la tabla física ó datos calculados sin haber usado group by --
+
 /*15.  Añadir un nuevo departamento: ‘Calidad’, con presupuesto de 40.000€ y código 11. Añadir un empleado vinculado al 
 departamento recién creado: Esther Vázquez, DNI: 89267109 */
 
@@ -191,6 +213,9 @@ INSERT INTO empleados (dni, nombre, apellidos, departamento) VALUES
 /*16.  Aplicar un recorte presupuestario del 10% a todos los departamentos*/ 
 
 -- Hacer un Update aplicando el recorte del 10% --
+
+UPDATE departamentos
+SET presupuesto = presupuesto * 0.9;
 
 /*17. Reasignar a los empleados del departamento de investigación (código 77) al departamento de informática (código 14)*/ 
 
