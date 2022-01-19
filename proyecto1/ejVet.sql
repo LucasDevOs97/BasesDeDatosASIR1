@@ -88,3 +88,14 @@ GROUP BY ubicacion
 HAVING COUNT(*) > 2;
 
 -- Las mascotas tienen que estar de alta en la clínica --
+
+/*
+
+Desde phpmyadmin hemos creado una nueva tabla llamada "veterinarios", con los siguientes campos: id, nombre, apellido, telefono
+Además, añadimos otra tabla más, llamada "atienden" que relacionará las tablas veterinarios y mascotas (N:M)
+Para crear las claves foráneas, tenemos que situarnos en la tabla atienden (id, idVet, idMasc, fecha), 
+en la estructura y apartado de 'Vista de relaciones'. 
+Le ponemos un nombre a la restricción (constraint), en columna seleccionamos idVet (es la FK), base de datos en este caso 'veterinaria',
+y elegimos la tabla a la que referencia, de la que extrae los datos. Detectará automáticamente el campo al que queremos referenciar.
+
+*/
