@@ -210,30 +210,154 @@ HAVING COUNT(*) > 2
 GROUP BY pacientes.nombre;
 
 /*7. Muestra el número de pacientes que pesan más de 70kg.*/
+
+SELECT COUNT(*) AS "Número de pacientes que pesan más de 70Kg"
+FROM pacientes
+WHERE peso > 70;
+
 /*8. Muestra el número de pacientes que miden entre 165 y 175 cm.*/
+
+SELECT COUNT(*) AS "Pacientes de entre 165 y 175 cm"
+FROM pacientes
+WHERE altura BETWEEN 165 AND 175;
+
 /*9. Muestra el número de pacientes que miden entre 165 y 175 cm y son mujeres.*/
+
+SELECT COUNT(*) AS "Pacientes de sexo femenino de entre 165 y 175 cmn de altura"
+FROM pacientes
+WHERE (altura BETWEEN 165 AND 175) AND sexo = "FEMENINO";
+
 /*10. Muestra el nombre, apellido y peso de los pacientes que toman resacol.*/
+
+SELECT pacientes.nombre, pacientes.apellido, pacientes.peso
+FROM pacientes INNER JOIN pacientestratamientos
+    ON pacientes.id = pacientestratamientos.idPaciente
+    INNER JOIN tratamientos
+        ON pacientestratamientos.idTratamiento = tratamientos.id
+WHERE tratamientos.nombre = "resacol"
+GROUP BY pacientes.nombre;
+
 /*11. Muestra el nombre y apellido de los doctores junto con el nombre y apellido de sus pacientes asignados.*/
+
+SELECT medicos.nombre, medicos.apellido, pacientes.nombre, pacientes.apellido
+FROM medicos INNER JOIN pacientes
+    ON medicos.id = pacientes.idMedico;
+
 /*12. Muestra el nombre y apellido de los doctores tengan o no pacientes asignados, en caso de tenerlos, muestra el
  nombre y apellido de dichos pacientes.*/
+
+SELECT medicos.nombre, medicos.apellido, pacientes.nombre, pacientes.apellido
+FROM medicos LEFT JOIN pacientes
+    ON medicos.id = pacientes.idMedico;
+
 /*13. Muestra el nombre y apellido de los doctores que tienen algún paciente que está siendo tratado con resacol.*/
+
+SELECT medicos.nombre, medicos.apellido
+FROM medicos INNER JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+    INNER JOIN pacientestratamientos
+        ON pacientestratamientos.idPaciente = pacientes.id
+        INNER JOIN tratamientos
+            ON tratamientos.id = pacientestratamientos.idTratamiento
+WHERE tratamientos.nombre = "resacol";
+
 /*14. Muestra los datos de los doctores, de sus pacientes asignados y los datos de los tratamientos que siguen dichos pacientes.*/
+
+SELECT medicos.*, pacientes.*, tratamientos.*
+FROM medicos INNER JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+    INNER JOIN pacientestratamientos
+        ON pacientestratamientos.idPaciente = pacientes.id
+        INNER JOIN tratamientos
+            ON tratamientos.id = pacientestratamientos.idTratamiento;
+
 /*15. Muestra los datos de los tratamientos, de los pacientes que se someten a dichos tratamientos y de los doctores asignados
  a dichos pacientes.*/
+
+SELECT tratamientos.*, pacientes.*, medicos.*
+FROM tratamientos INNER JOIN pacientestratamientos
+    ON tratamientos.id = pacientestratamientos.idTratamiento
+    INNER JOIN pacientes
+    ON pacientestratamientos.idPaciente = pacientes.id
+    INNER JOIN medicos
+        ON pacientes.idMedico = medicos.id;
+
 /*16. Muestra los datos de los tratamientos, de los pacientes que se someten a dichos tratamientos y de los doctores tengan
  o no pacientes asignados.*/
-/*17. Muestra cuántos pacientes tiene cada doctor (incluyendo a los doctores que no tengan pacientes asignados)
+
+SELECT tratamientos.*, pacientes.*, medicos.*
+FROM tratamientos INNER JOIN pacientestratamientos
+    ON tratamientos.id = pacientestratamientos.idTratamiento
+    INNER JOIN pacientes
+        ON pacientestratamientos.idPaciente = pacientes.id
+        RIGHT JOIN medicos
+            ON pacientes.idMedico = medicos.id;
+
+/*17. Muestra cuántos pacientes tiene cada doctor (incluyendo a los doctores que no tengan pacientes asignados)*/
+
+SELECT COUNT(*) AS "Pacientes que tiene cada doctor", medicos.nombre
+FROM medicos LEFT JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+GROUP BY medicos.nombre;
+
 /*18. Muestra los datos de los doctores, así como los datos de sus pacientes, en caso de que los doctores tengan menos de
  2 pacientes (NO se incluirán los doctores que no tengan pacientes).*/
+
+SELECT COUNT(*) AS "Pacientes que tiene cada doctor", medicos.*, pacientes.*
+FROM medicos INNER JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+GROUP BY medicos.nombre
+HAVING COUNT(*) < 2;
+
 /*19. Inserta un paciente que no se someta a tratamiento alguno.*/
+
+INSERT INTO pacientes (nombre, apellido, edad, sexo, peso, altura, idMedico) VALUES
+("Pepe", "Perez", 32, "MASCULINO", 81, 180, 7);
+
 /*20. Muestra los datos del paciente que no sigue ningún tratamiento.*/
+
+SELECT *
+FROM pacientes
+WHERE id = 12;
+
 /*21. Muestra los datos de los pacientes que siguen algún tratamiento y de los que no, mostrando también los datos de los tratamientos.*/
+
+SELECT pacientes.*, tratamientos.*
+FROM tratamientos INNER JOIN pacientestratamientos
+    ON tratamientos.id = pacientestratamientos.idTratamiento
+    RIGHT JOIN pacientes
+        ON pacientestratamientos.idPaciente = pacientes.id;
+
 /*22. Muestra los datos de los doctores que tienen algún paciente cuyo nombre empiece por M y tenga entre 20 y 28 años.*/
+
+SELECT medicos.*
+FROM medicos INNER JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+WHERE (pacientes.edad BETWEEN 20 AND 28) AND pacientes.nombre LIKE "M%";
+
 /*23. Muestra cuántos pacientes reciben tratamiento en el Canalejo.*/
+
+SELECT COUNT(*) AS "Pacientes tratados en el Canalejo"
+FROM tratamientos INNER JOIN pacientestratamientos
+    ON tratamientos.id = pacientestratamientos.idTratamiento
+    INNER JOIN pacientes
+        ON pacientestratamientos.idPaciente = pacientes.id
+        INNER JOIN medicos
+            ON pacientes.idMedico = medicos.id
+WHERE hospital = "Canalejo";
+
 /*24. Muestra cuántos pacientes son masculinos y cuántos son femeninos distinguiéndolos según su altura.*/
+
+SELECT COUNT(*) AS "Número de pacientes", pacientes.altura, pacientes.sexo
+FROM pacientes
+GROUP BY pacientes.altura, pacientes.sexo;
+
 /*25. Muestra cuántos doctores trabajan en cada hospital siempre y cuando su nombre tenga más de 4 letras.*/
 
-*/
+SELECT COUNT(*) AS "Número de doctores por hospital", nombre
+FROM medicos 
+WHERE medicos.nombre LIKE "%_____%"
+GROUP BY medicos.nombre;
 
 
 
