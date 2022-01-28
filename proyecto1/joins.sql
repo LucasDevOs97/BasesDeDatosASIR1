@@ -160,10 +160,7 @@ PASAR LO DE LA LIBRETA
 /*1. Muestra los datos de los pacientes y los id de los tratamientos que siguen.*/
 
 SELECT  pacientes.*, pacientestratamientos.idTratamiento
-FROM pacientes INNER JOIN pacientestratamientos 
-ON pacientes.id = pacientestratamientos.idPaciente
-INNER JOIN tratamientos
-ON pacientestratamientos.idTratamiento = tratamientos.id;
+FROM pacientes INNER JOIN pacientestratamientos;
 
 /*2. Muestra los datos de los pacientes y los datos de los tratamientos que siguen.*/
 
@@ -195,19 +192,15 @@ WHERE tratamientos.eficacia < 85;
 SELECT pacientes.nombre, pacientes.apellido, COUNT(*)
 FROM pacientes INNER JOIN pacientestratamientos
     ON pacientes.id = pacientestratamientos.idPaciente
-    INNER JOIN tratamientos
-        ON pacientestratamientos.idTratamiento = tratamientos.id
-GROUP BY pacientes.nombre;
+GROUP BY pacientes.id;
 
 /*6. Muestra el nombre y apellido de los pacientes que reciban más de 2 tratamientos.*/
 
 SELECT pacientes.nombre, pacientes.apellido
 FROM pacientes INNER JOIN pacientestratamientos
     ON pacientes.id = pacientestratamientos.idPaciente
-    INNER JOIN tratamientos
-        ON pacientestratamientos.idTratamiento = tratamientos.id
-HAVING COUNT(*) > 2
-GROUP BY pacientes.nombre;
+GROUP BY pacientes.id
+HAVING COUNT(*) > 2;
 
 /*7. Muestra el número de pacientes que pesan más de 70kg.*/
 
@@ -234,19 +227,18 @@ FROM pacientes INNER JOIN pacientestratamientos
     ON pacientes.id = pacientestratamientos.idPaciente
     INNER JOIN tratamientos
         ON pacientestratamientos.idTratamiento = tratamientos.id
-WHERE tratamientos.nombre = "resacol"
-GROUP BY pacientes.nombre;
+WHERE tratamientos.nombre = "resacol";
 
 /*11. Muestra el nombre y apellido de los doctores junto con el nombre y apellido de sus pacientes asignados.*/
 
-SELECT medicos.nombre, medicos.apellido, pacientes.nombre, pacientes.apellido
+SELECT medicos.nombre AS "Nombre médico", medicos.apellido AS "Apellido médico", pacientes.nombre AS "Nombre paciente", pacientes.apellido AS "Apellido paciente"
 FROM medicos INNER JOIN pacientes
     ON medicos.id = pacientes.idMedico;
 
 /*12. Muestra el nombre y apellido de los doctores tengan o no pacientes asignados, en caso de tenerlos, muestra el
  nombre y apellido de dichos pacientes.*/
 
-SELECT medicos.nombre, medicos.apellido, pacientes.nombre, pacientes.apellido
+SELECT medicos.nombre AS "Nombre médico", medicos.apellido AS "Apellido médico", pacientes.nombre AS "Nombre paciente", pacientes.apellido AS "Apelldio paciente"
 FROM medicos LEFT JOIN pacientes
     ON medicos.id = pacientes.idMedico;
 
@@ -292,6 +284,18 @@ FROM tratamientos INNER JOIN pacientestratamientos
         ON pacientestratamientos.idPaciente = pacientes.id
         RIGHT JOIN medicos
             ON pacientes.idMedico = medicos.id;
+
+-- Empezando por la tabla de médicos --
+
+SELECT *
+FROM medicos LEFT JOIN pacientes 
+    ON medicos.id = pacientes.idMedico
+    LEFT JOIN pacientestratamientos
+    ON pacientestratamientos.idPaciente = pacientes.id 
+    LEFT JOIN tratamientos
+    ON tratamientos.id = pacientestratamientos.idTratamiento;
+
+-- Nos quedamos aquí corrigiendo --
 
 /*17. Muestra cuántos pacientes tiene cada doctor (incluyendo a los doctores que no tengan pacientes asignados)*/
 
