@@ -302,7 +302,14 @@ FROM medicos LEFT JOIN pacientes
 SELECT COUNT(*) AS "Pacientes que tiene cada doctor", medicos.nombre
 FROM medicos LEFT JOIN pacientes
     ON medicos.id = pacientes.idMedico
-GROUP BY medicos.nombre;
+GROUP BY medicos.id;
+
+-- Corrección --
+
+SELECT COUNT(pacientes.idMedico) AS "Número de pacientes", medicos.nombre, medicos.apellido
+FROM medicos LEFT JOIN pacientes
+    ON medicos.id = pacientes.idMedico
+GROUP BY medicos.id;
 
 /*18. Muestra los datos de los doctores, así como los datos de sus pacientes, en caso de que los doctores tengan menos de
  2 pacientes (NO se incluirán los doctores que no tengan pacientes).*/
@@ -310,7 +317,7 @@ GROUP BY medicos.nombre;
 SELECT COUNT(*) AS "Pacientes que tiene cada doctor", medicos.*, pacientes.*
 FROM medicos INNER JOIN pacientes
     ON medicos.id = pacientes.idMedico
-GROUP BY medicos.nombre
+GROUP BY medicos.id
 HAVING COUNT(*) < 2;
 
 /*19. Inserta un paciente que no se someta a tratamiento alguno.*/
@@ -323,6 +330,13 @@ INSERT INTO pacientes (nombre, apellido, edad, sexo, peso, altura, idMedico) VAL
 SELECT *
 FROM pacientes
 WHERE id = 12;
+
+-- Corrección --
+
+SELECT *
+FROM pacientes LEFT JOIN pacientestratamientos
+    ON pacientes.id = pacientestratamientos.idPaciente
+WHERE pacientestratamientos.idPaciente IS NULL;
 
 /*21. Muestra los datos de los pacientes que siguen algún tratamiento y de los que no, mostrando también los datos de los tratamientos.*/
 
@@ -341,27 +355,30 @@ WHERE (pacientes.edad BETWEEN 20 AND 28) AND pacientes.nombre LIKE "M%";
 
 /*23. Muestra cuántos pacientes reciben tratamiento en el Canalejo.*/
 
-SELECT COUNT(*) AS "Pacientes tratados en el Canalejo"
-FROM tratamientos INNER JOIN pacientestratamientos
-    ON tratamientos.id = pacientestratamientos.idTratamiento
-    INNER JOIN pacientes
-        ON pacientestratamientos.idPaciente = pacientes.id
-        INNER JOIN medicos
-            ON pacientes.idMedico = medicos.id
-WHERE hospital = "Canalejo";
+SELECT COUNT(*) AS "NUMERO DE PACIENTES TRATADOS EN EL CANALEJO"
+FROM pacientes INNER JOIN medicos
+	ON pacientes.idMedico = medicos.id
+WHERE medicos.hospital LIKE "CANALEJO";
 
 /*24. Muestra cuántos pacientes son masculinos y cuántos son femeninos distinguiéndolos según su altura.*/
 
 SELECT COUNT(*) AS "Número de pacientes", pacientes.altura, pacientes.sexo
 FROM pacientes
-GROUP BY pacientes.altura, pacientes.sexo;
+GROUP BY pacientes.sexo, pacientes.altura;
 
 /*25. Muestra cuántos doctores trabajan en cada hospital siempre y cuando su nombre tenga más de 4 letras.*/
 
-SELECT COUNT(*) AS "Número de doctores por hospital", nombre
+SELECT COUNT(*) AS "Número de doctores por hospital", hospital
 FROM medicos 
-WHERE medicos.nombre LIKE "%_____%"
-GROUP BY medicos.nombre;
+WHERE medicos.nombre LIKE "_____%" -- quitamos el primer porcentaje para obligar a que empeice por algún carácter --
+GROUP BY medicos.hospital;
+
+-- Otra forma --
+
+SELECT COUNT(*) AS "Número de doctores por hospital", hospital
+FROM medicos
+WHERE nombre CHAR_LENGTH(nombre) > 4
+GROUP BY hospital;
 
 
 
