@@ -275,11 +275,33 @@ WHERE registra.medio = "Internet";
 comercio en el que lo ha adquirido.*/
 
 SELECT cliente.*, programa.nombre, registra.medio, comercio.nombre
-FROM 
+FROM cliente INNER JOIN registra USING (dni)
+    INNER JOIN programa USING (codigo)
+        INNER JOIN distribuye USING (codigo)
+            INNER JOIN comercio USING (cif);
+
+SELECT cliente.*, programa.nombre, registra.medio, comercio.nombre
+FROM cliente INNER JOIN registra
+    ON cliente.dni = registra.dni
+    INNER JOIN programa
+        ON programa.codigo = registra.codigo
+        INNER JOIN distribuye
+            ON distribuye.codigo = programa.codigo
+            INNER JOIN comercio
+            ON comercio.cif = distribuye.cif;
 
 -- 39.Obtén el nombre de los usuarios que han registrado el programa "Paradox" en su versión "2". --
 
+SELECT cliente.nombre 
+FROM cliente INNER JOIN registra
+    ON cliente.dni = registra.dni
+    INNER JOIN programa
+    ON registra.codigo = programa.codigo
+WHERE programa.nombre = "Paradox" AND programa.version = "2";
+
 -- 40.  Nombre de aquellos fabricantes cuyo país es el mismo que 'Oracle'. (Subconsulta). --
+
+
 
 -- 41.  Nombre de aquellos clientes que tienen la misma edad que Pepe Pérez. (Subconsulta). --
 
