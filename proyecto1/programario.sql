@@ -301,19 +301,72 @@ WHERE programa.nombre = "Paradox" AND programa.version = "2";
 
 -- 40.  Nombre de aquellos fabricantes cuyo país es el mismo que 'Oracle'. (Subconsulta). --
 
-
+SELECT fabricante.nombre
+FROM fabricante
+WHERE fabricante.pais = (
+    SELECT fabricante.pais
+    FROM fabricante INNER JOIN desarrolla
+        ON fabricante.id_fab = desarrolla.id_fab
+        INNER JOIN programa
+        ON desarrolla.codigo = programa.codigo
+    WHERE programa.nombre = "Oracle"
+);
 
 -- 41.  Nombre de aquellos clientes que tienen la misma edad que Pepe Pérez. (Subconsulta). --
 
+SELECT cliente.nombre
+FROM cliente 
+WHERE cliente.edad = (
+    SELECT cliente.edad
+    FROM cliente
+    WHERE cliente.nombre = "Pepe Pérez"
+);
+
 -- 42. Genera un listado con los comercios que tienen su sede en la misma ciudad que tiene el comercio 'Centro Mail'. (Subconsulta). --
 
--- 43. ) Nombre de aquellos clientes que han registrado un producto de la misma forma que el cliente 'Pepe Pérez'. (Subconsulta). --
+SELECT *
+FROM comercio
+WHERE comercio.ciudad = (
+    SELECT comercio.ciudad
+    FROM comercio
+    WHERE comercio.nombre = "Centro Mail"
+);
+
+-- 43. ) Nombre de aquellos clientes que han registrado un producto de la misma forma que el cliente 'Pepe Pérez'. (Subconsulta). -- 
+/* MAL */
+
+SELECT cliente.nombre
+FROM cliente 
+WHERE registra.medio = (
+    SELECT registra.medio
+    FROM registra INNER JOIN cliente
+        ON registra.dni = cliente.dni
+    WHERE cliente.nombre = "Pepe Pérez"
+);
 
 -- 44. Obtener el número de programas que hay en la tabla programas. --
 
+SELECT COUNT(codigo) AS "Total Progrmas"
+FROM programa;
+
+SELECT COUNT(*) AS "Total Programas"
+
 -- 45. ) Calcula el número de clientes cuya edad es mayor de 40 años. --
 
+SELECT COUNT(dni) AS "Clientes mayores de 40"
+FROM cliente
+WHERE edad > 40;
+
 -- 46.  Calcula el número de productos que ha vendido el establecimiento cuyo CIF es 1. --
+
+SELECT COUNT(distribuye.codigo) AS "Productos vendidos por el CIF 1"
+FROM cliente INNER JOIN registra
+    ON cliente.dni = registra.dni
+    INNER JOIN comercio
+    ON registra.cif = comercio.cif
+    INNER JOIN distribuye
+    ON comercio.cif = distribuye.cif
+WHERE distribuye.cif = 1;
 
 -- 47. ) Calcula la media de programas que se venden cuyo código es 7. --
 
