@@ -370,19 +370,65 @@ WHERE distribuye.cif = 1;
 
 -- 47. ) Calcula la media de programas que se venden cuyo código es 7. --
 
+SELECT COUNT(programa.codigo)/distribuye.cantidad AS "Media de programas vendidos del código 7"
+FROM programa INNER JOIN distribuye
+    ON programa.codigo = distribuye.codigo
+WHERE programa.codigo = 7;
+
 -- 48.  Calcula la mínima cantidad de programas de código 7 que se ha vendido --
+
+SELECT MIN(distribuye.cantidad) AS "Minimo vendidos del código 7"
+FROM programa INNER JOIN distribuye
+    ON programa.codigo = distribuye.codigo
+WHERE programa.codigo = 7;
 
 -- 49.  Calcula la máxima cantidad de programas de código 7 que se ha vendido. --
 
+SELECT MAX(distribuye.cantidad) AS "Máximo vendido del código 7"
+FROM programa INNER JOIN distribuye
+    ON programa.codigo = distribuye.codigo
+WHERE programa.codigo = 7;
+
 -- 50. ¿En cuántos establecimientos se vende el programa cuyo código es 7? --
+
+SELECT COUNT(comercio.cif) AS "Establecimientos donde se vende el programa de código 7"
+FROM programa INNER JOIN distribuye 
+    ON programa.codigo = distribuye.codigo
+    INNER JOIN comercio
+    ON distribuye.cif = comercio.cif
+WHERE programa.codigo = 7;
 
 -- 51. Calcular el número de registros que se han realizado por Internet. --
 
+SELECT COUNT(*) "Número de registros por Internet"
+FROM registra
+WHERE medio = "Internet";
+
 -- 52. Obtener el número total de programas que se han vendido en 'Sevilla'. --
 
+SELECT COUNT(programa.codigo) AS "Número de programas vendidos en Sevilla"
+FROM programa INNER JOIN distribuye
+    ON programa.codigo = distribuye.codigo
+    INNER JOIN comercio 
+    ON distribuye.cif = comercio.cif
+WHERE comercio.ciudad = "Sevilla";
+
 -- 53. Calcular el número total de programas que han desarrollado los fabricantes cuyo país es 'Estados Unidos'. --
+
+SELECT COUNT(programa.codigo) AS "Número de programas desarrollados por fabricantes de EEUU"
+FROM programa INNER JOIN desarrolla
+    ON programa.codigo = desarrolla.codigo
+    INNER JOIN fabricante
+    ON fabricante.id_fab = desarrolla.id_fab
+WHERE fabricante.pais = "Estados Unidos";
 
 /* 54.  Visualiza el nombre de todos los clientes en mayúscula. En el resultado de la consulta debe aparecer también la longitud de
  la cadena nombre. (USAR UPPER() Y LENGTH())*/
 
+ SELECT UPPER(cliente.nombre), LENGTH(cliente.nombre) AS "Longitud del nombre"
+ FROM cliente;
+
 -- 55. Con una consulta concatena los campos nombre y versión de la tabla programa. (USAR CONCAT()) --
+
+SELECT CONCAT(programa.nombre, " ", programa.version)
+FROM programa;
