@@ -241,12 +241,6 @@ FROM cliente INNER JOIN registra
     ON cliente.dni = registra.dni
 WHERE registra.medio = "Internet";
 
-
-
-
--- LA ÚLTIMA QUE CORREGIMOS FUE LA 34 --
-
-
 -- 35. ) ¿Qué programas han recibido registros por tarjeta postal? --
 
 SELECT programa.nombre
@@ -281,6 +275,13 @@ FROM cliente INNER JOIN registra USING (dni)
             INNER JOIN comercio USING (cif);
 
 SELECT cliente.*, programa.nombre, registra.medio, comercio.nombre
+FROM cliente INNER JOIN registra USING(dni)
+    INNER JOIN programa USING (codigo)
+    INNER JOIN distribuye USING (codigo)
+    INNER JOIN comercio 
+    ON distribuye.cif = comercio.cif;
+
+SELECT cliente.*, programa.nombre, registra.medio, comercio.nombre
 FROM cliente INNER JOIN registra
     ON cliente.dni = registra.dni
     INNER JOIN programa
@@ -289,6 +290,19 @@ FROM cliente INNER JOIN registra
             ON distribuye.codigo = programa.codigo
             INNER JOIN comercio
             ON comercio.cif = distribuye.cif;
+
+-- Las dos consultas anteriores estarían mal porque no nos hace falta la table distribuye, ya está relacionado por la tabla registra --
+
+-- Corrección --
+
+SELECT cliente.*, programa.nombre, registra.medio, comercio.nombre
+FROM cliente INNER JOIN registra 
+    USING(dni)
+    INNER JOIN programa 
+    USING(codigo)
+    INNER JOIN comercio
+    USING(cif); 
+
 
 -- 39.Obtén el nombre de los usuarios que han registrado el programa "Paradox" en su versión "2". --
 
@@ -312,6 +326,16 @@ WHERE fabricante.pais = (
     WHERE programa.nombre = "Oracle"
 );
 
+-- Corrección --
+
+SELECT fabricante.nombre
+FROM fabricante
+WHERE pais = (
+    SELECT pais
+    FROM fabricante
+    WHERE nombre = "Oracle"
+) AND nombre NOT LIKE "Oracle";
+
 -- 41.  Nombre de aquellos clientes que tienen la misma edad que Pepe Pérez. (Subconsulta). --
 
 SELECT cliente.nombre
@@ -320,7 +344,7 @@ WHERE cliente.edad = (
     SELECT cliente.edad
     FROM cliente
     WHERE cliente.nombre = "Pepe Pérez"
-);
+) AND cliente.nombre NOT LIKE "Pepe Pérez";
 
 -- 42. Genera un listado con los comercios que tienen su sede en la misma ciudad que tiene el comercio 'Centro Mail'. (Subconsulta). --
 
@@ -330,19 +354,22 @@ WHERE comercio.ciudad = (
     SELECT comercio.ciudad
     FROM comercio
     WHERE comercio.nombre = "Centro Mail"
-);
+) AND comercio.nombre NOT LIKE "Centro Mail";
 
 -- 43. ) Nombre de aquellos clientes que han registrado un producto de la misma forma que el cliente 'Pepe Pérez'. (Subconsulta). -- 
-/* MAL */
+
 
 SELECT cliente.nombre
-FROM cliente 
-WHERE registra.medio = (
+FROM cliente INNER JOIN registra USING (dni)
+WHERE registra.medio IN (
     SELECT registra.medio
     FROM registra INNER JOIN cliente
         ON registra.dni = cliente.dni
     WHERE cliente.nombre = "Pepe Pérez"
-);
+) AND cliente.nombre NOT LIKE "Pepe Pérez";
+
+/* No podemos utilizar el = porque la subcosulta nos devuelve dos valores, tenemos que usar la cláusula IN, puede estar contenido en un resultado o en 
+el otro */
 
 -- 44. Obtener el número de programas que hay en la tabla programas. --
 
@@ -350,6 +377,9 @@ SELECT COUNT(codigo) AS "Total Progrmas"
 FROM programa;
 
 SELECT COUNT(*) AS "Total Programas"
+FROM programa;
+
+-- NOS QUEDAMOS CORRIGIENDO ESTA CONSULTA --
 
 -- 45. ) Calcula el número de clientes cuya edad es mayor de 40 años. --
 
