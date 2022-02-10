@@ -379,7 +379,10 @@ FROM programa;
 SELECT COUNT(*) AS "Total Programas"
 FROM programa;
 
--- NOS QUEDAMOS CORRIGIENDO ESTA CONSULTA --
+-- Otra forma --
+
+SELECT COUNT(DISTINCT nombre) 
+FROM programa;
 
 -- 45. ) Calcula el número de clientes cuya edad es mayor de 40 años. --
 
@@ -398,6 +401,14 @@ FROM cliente INNER JOIN registra
     ON comercio.cif = distribuye.cif
 WHERE distribuye.cif = 1;
 
+-- CORRECCIÓN --
+
+SELECT SUM(cantidad)
+FROM distribuye
+WHERE cif = 1;
+
+-- Solo trabajamos con la tabla distribuye
+
 -- 47. ) Calcula la media de programas que se venden cuyo código es 7. --
 
 SELECT COUNT(programa.codigo)/distribuye.cantidad AS "Media de programas vendidos del código 7"
@@ -405,19 +416,35 @@ FROM programa INNER JOIN distribuye
     ON programa.codigo = distribuye.codigo
 WHERE programa.codigo = 7;
 
+-- CORRECiÓN --
+
+SELECT AVG(cantidad)
+FROM distribuye
+WHERE codigo = 7;
+
+-- Si queremos redondear la salida --
+SELECT ROUND(AVG(cantidad))
+FROM distribuye
+WHERE codigo = 7;
+
+-- Otra forma --
+
+SELECT ((SELECT SUM(cantidad)
+                        FROM distribuye
+                        WHERE codigo = 7) / SUM(cantidad)) * 100
+FROM distribuye;
+
 -- 48.  Calcula la mínima cantidad de programas de código 7 que se ha vendido --
 
-SELECT MIN(distribuye.cantidad) AS "Minimo vendidos del código 7"
-FROM programa INNER JOIN distribuye
-    ON programa.codigo = distribuye.codigo
-WHERE programa.codigo = 7;
+SELECT MIN(cantidad) AS "Cantidad mínima de programas de código 7 vendidos"
+FROM distribuye
+WHERE codigo = 7;
 
 -- 49.  Calcula la máxima cantidad de programas de código 7 que se ha vendido. --
 
-SELECT MAX(distribuye.cantidad) AS "Máximo vendido del código 7"
-FROM programa INNER JOIN distribuye
-    ON programa.codigo = distribuye.codigo
-WHERE programa.codigo = 7;
+SELECT MAX(cantidad) AS "Cantidad máxima de programas de código 7 vendidos"
+FROM distribuye
+WHERE codigo = 7;
 
 -- 50. ¿En cuántos establecimientos se vende el programa cuyo código es 7? --
 
@@ -427,6 +454,12 @@ FROM programa INNER JOIN distribuye
     INNER JOIN comercio
     ON distribuye.cif = comercio.cif
 WHERE programa.codigo = 7;
+
+-- Corrección --
+
+SELECT COUNT(cif) AS "Establecimientos donde se vende el programa de código 7"
+FROM distribuye
+WHERE codigo = 7;
 
 -- 51. Calcular el número de registros que se han realizado por Internet. --
 
@@ -443,6 +476,26 @@ FROM programa INNER JOIN distribuye
     ON distribuye.cif = comercio.cif
 WHERE comercio.ciudad = "Sevilla";
 
+-- Corrección --
+-- Por codigo de programa --
+
+SELECT COUNT(DISTINCT distribuye.codigo) AS "TOTAL"
+FROM comercio INNER JOIN distribuye USING (cif)
+WHERE comercio.ciudad = "Sevilla";
+
+-- Por cantidad de cada programa. Esta sería la respuesta correcta --
+
+SELECT SUM(distribuye.cantidad) AS "TOTAL"
+FROM comercio INNER JOIN distribuye USING (cif)
+WHERE comercio.ciudad = "Sevilla";
+
+-- CANTIDAD TOTAL DE UNIDADES VENDIDAS DE CADA PROGRAMA --
+
+SELECT SUM(distribuye.cantidad) AS "TOTAL", distribuye.codigo
+FROM comercio INNER JOIN distribuye USING (cif)
+WHERE comercio.ciudad = "Sevilla"
+GROUP BY distribuye.codigo;
+
 -- 53. Calcular el número total de programas que han desarrollado los fabricantes cuyo país es 'Estados Unidos'. --
 
 SELECT COUNT(programa.codigo) AS "Número de programas desarrollados por fabricantes de EEUU"
@@ -452,13 +505,52 @@ FROM programa INNER JOIN desarrolla
     ON fabricante.id_fab = desarrolla.id_fab
 WHERE fabricante.pais = "Estados Unidos";
 
+-- NO HACE FALTA información de la tabla programa porque el código ya lo tenemos en la tabla intermedia --
+
+-- CORRECCIÓN --
+-- interpretando que las versiones no cambian el programa --
+
+SELECT COUNT(DISTINCT desarrolla.codigo) AS "TOTAL PROGRAMAS DE EEUU"
+FROM fabricante INNER JOIN desarrolla USING (id_fab)
+WHERE fabricante.pais = "Estados Unidos";
+
+-- interpretando que distintas versiones cuentan como otro programa--
+
+SELECT COUNT(desarrolla.codigo)
+FROM distribuye INNER JOIN fabricante USING (id_fab)
+    INNER JOIN programa USING (codigo)
+WHERE fabricante.pais = "Estados Unidos"
+GROUP BY programa.nombre; -- ver el archivo de Rico --
+
 /* 54.  Visualiza el nombre de todos los clientes en mayúscula. En el resultado de la consulta debe aparecer también la longitud de
  la cadena nombre. (USAR UPPER() Y LENGTH())*/
 
- SELECT UPPER(cliente.nombre), LENGTH(cliente.nombre) AS "Longitud del nombre"
+ SELECT UPPER(nombre) AS "NOMBRE", CHAR_LENGTH(nombre) AS "Longitud del nombre"
  FROM cliente;
+
+ -- LENGTH cuenta los bytes, por lo que las tildes también las cuenta --
+ -- CHAR_LENGTH cuenta el número de caracteres --
 
 -- 55. Con una consulta concatena los campos nombre y versión de la tabla programa. (USAR CONCAT()) --
 
 SELECT CONCAT(programa.nombre, " ", programa.version)
 FROM programa;
+
+-- Si concatena con un campo nulo, pone toda la fila a null --
+
+SELECT CONCAT_WS(" ", nombre, version)
+FROM programa;
+
+-- Primero ponemos el separador y luego las columnas que queremos concatenar --
+
+-- b) Concatena las distintas versiones con el nombre del programa en un mismo registro --
+
+SELECT nombre, GROUP_CONCAT(version SEPARATOR " ; ")
+FROM programa
+GROUP BY nombre;
+
+-- c) Mostrar la misma información que se pide en el apartado b pero monstrándola en una columna --
+
+SELECT CONCAT_WS(". Versión: ", nombre, GROUP_CONCAT(version SEPARATOR " ; "))
+FROM programa
+GROUP BY nombre;
