@@ -75,3 +75,5 @@ INSERT INTO asesinos_prisiones (id_asesino, id_prision, fecha) VALUES
 
 INSERT INTO prisiones (nombre, dimensiones, seguridad) VALUES
 ("Isla del diablo", 650, "maxima");
+
+/*2) */
