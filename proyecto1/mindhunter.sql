@@ -72,3 +72,6 @@ INSERT INTO asesinos_prisiones (id_asesino, id_prision, fecha) VALUES
 -- EJERCICIOS --
 
 /*1) Inserta la prisión “Isla del diablo” en la Guayana Francesa con 650m y seguridad máxima.*/
+
+INSERT INTO prisiones (nombre, dimensiones, seguridad) VALUES
+("Isla del diablo", 650, "maxima");
