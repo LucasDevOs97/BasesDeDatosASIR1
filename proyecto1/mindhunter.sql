@@ -76,4 +76,15 @@ INSERT INTO asesinos_prisiones (id_asesino, id_prision, fecha) VALUES
 INSERT INTO prisiones (nombre, dimensiones, seguridad) VALUES
 ("Isla del diablo", 650, "maxima");
 
-/*2) */
+/*2) Inserta una víctima llamada Manuel Rico López 34 años. ¿Se puede hacer esto? En caso de que pueda hacerse, ¿qué información aportaría este dato
+al estudio del criminólogo?*/
+
+/*3) ¿Cuántos asesinos hubo en Teixeiro?*/
+
+SELECT COUNT(*)
+FROM prisiones INNER JOIN asesinos_prisiones
+    ON prisiones.id = asesinos_prisiones.id_prision
+WHERE prisiones.nombre LIKE "Teixeiro";
+
+/*4) ¿Cuántos asesinos hay en la prisión que menos asesinos alberga a lo largo de nuestro registro?*/
+
