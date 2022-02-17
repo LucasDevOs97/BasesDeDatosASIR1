@@ -88,3 +88,85 @@ WHERE prisiones.nombre LIKE "Teixeiro";
 
 /*4) ¿Cuántos asesinos hay en la prisión que menos asesinos alberga a lo largo de nuestro registro?*/
 
+SELECT COUNT(*)
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+/* Mostrar el nombre, apellidos y apodo de los asesinos en una única columna y el nombre y los apellidos de las víctimas de cada uno
+en otra columna */
+
+-- Cuando nos hablan de mostrar en una única columna tenemos que pensar siempre en CONCAT --
+-- GROUP_CONCAT -> juntar filas en una única fila. --
+-- Podemos combinar ambas --
+
+-- Primer paso: Obtener toda la información que necesitamos --
+
+SELECT *
+FROM asesinos INNER JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    INNER JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id;
+
+-- Segundo paso: Empleamos el CONCAT para unir las columnas que se nos pide sobre los asesinos --
+
+SELECT CONCAT(asesinos.nombre, " ", asesinos.apellidos, " aka ", asesinos.apodo) AS "DATOS DEL ASESINO", victimas.*
+FROM asesinos INNER JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    INNER JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id;
+
+-- Tercer paso: agrupar por nombre de los asesinos y agrupar los registros de las victimas --
+
+SELECT CONCAT(asesinos.nombre, " ", asesinos.apellidos, " aka ", asesinos.apodo) AS "DATOS DEL ASESINO", GROUP_CONCAT(CONCAT(victimas.nombre, " ", 
+victimas.apellidos)), COUNT(asesinosvictimas.id)
+FROM asesinos INNER JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    INNER JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id
+GROUP BY asesinos.nombre;
+
+/*Mostrar el nombre, apellidos y apodo de los asesinos en una única columna y el nombre y los apellidos de las víctimas de cada uno
+en otra columna. Mostrar también aquellos asesinos que no tienen víctimas.*/
+
+-- Primer paso: Obtener toda la información que necesitamos --
+
+SELECT *
+FROM asesinos LEFT JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    LEFT JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id;
+
+-- Segundo paso: Empleamos el CONCAT para unir las columnas que se nos pide sobre los asesinos --
+
+SELECT CONCAT(asesinos.nombre, " ", asesinos.apellidos, " aka ", asesinos.apodo) AS "DATOS DEL ASESINO", victimas.*
+FROM asesinos LEFT JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    LEFT JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id;
+
+-- Tercer paso: agrupar por nombre de los asesinos y agrupar los registros de las victimas --
+
+SELECT CONCAT(asesinos.nombre, " ", asesinos.apellidos, " aka ", asesinos.apodo) AS "DATOS DEL ASESINO", GROUP_CONCAT(victimas.nombre)
+FROM asesinos LEFT JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    LEFT JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id
+GROUP BY asesinos.nombre;
+
+SELECT CONCAT(asesinos.nombre, " ", asesinos.apellidos, " aka ", asesinos.apodo) AS "DATOS DEL ASESINO", GROUP_CONCAT(CONCAT(victimas.nombre, " ", 
+victimas.apellidos)), COUNT(asesinosvictimas.id)
+FROM asesinos LEFT JOIN asesinosvictimas
+    ON asesinos.id = asesinosvictimas.id_asesino
+    LEFT JOIN victimas
+    ON asesinosvictimas.id_victima = victimas.id
+GROUP BY asesinos.nombre;
+
+------------------------------------------------------------------------------------------------
+
+/*En cuántas cárceles estuvo cada asesino (no puede contar las prisiones que son iguales, en las DISTINTAS prisiones)*/
+
+SELECT asesinos.nombre, asesinos.apellidos, COUNT(DISTINCT asesinos_prisiones.id_prision) AS "VECES ENCARCELADO"
+FROM asesinos LEFT JOIN asesinos_prisiones
+    ON asesinos.id = asesinos_prisiones.id_asesino
+GROUP BY asesinos.nombre;
