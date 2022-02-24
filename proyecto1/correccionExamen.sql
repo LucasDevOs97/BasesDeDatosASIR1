@@ -42,7 +42,14 @@ GROUP BY surfistas.id;
 
 /*5) MUESTRA LAS PLAYAS QUE NO FUERON SURFEADAS POR NINGUN SURFISTA CON OLAS CUYA DIFICULTAD NO SEA NI MEDIA NI FACIL.*/
 
-
+SELECT *
+FROM surfistas LEFT JOIN playassurfistas
+    ON surfistas.id = playassurfistas.idSurfista
+    RIGHT JOIN playas
+    ON playassurfistas.idPlaya = playas.id
+    LEFT JOIN olas
+    ON playas.id = olas.idPlaya
+WHERE olas.dificultad NOT IN ("media", "facil");
 
 /*6) MUESTRA LA INFORMACIÓN DE LAS PLAYAS CON UNA EXTENSIÓN MAYOR A 500,00 METROS CUADRADOS QUE HAYAN SIDO SURFEADAS POR
 MENOS DE 2 SURFISTAS.*/
