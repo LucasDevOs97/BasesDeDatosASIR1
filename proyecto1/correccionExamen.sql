@@ -42,20 +42,42 @@ GROUP BY surfistas.id;
 
 /*5) MUESTRA LAS PLAYAS QUE NO FUERON SURFEADAS POR NINGUN SURFISTA CON OLAS CUYA DIFICULTAD NO SEA NI MEDIA NI FACIL.*/
 
-SELECT *
-FROM surfistas LEFT JOIN playassurfistas
-    ON surfistas.id = playassurfistas.idSurfista
-    RIGHT JOIN playas
+SELECT playas.*
+FROM playassurfistas RIGHT JOIN playas
     ON playassurfistas.idPlaya = playas.id
     LEFT JOIN olas
     ON playas.id = olas.idPlaya
-WHERE olas.dificultad NOT IN ("media", "facil");
+WHERE playassurfistas.idSurfista IS NULL AND olas.dificultad NOT IN ("media", "facil");
+
+-- Me da dos playas como resultado porque escribí mall la dificultad creando las tablas, en vez de facil -> fecil --
 
 /*6) MUESTRA LA INFORMACIÓN DE LAS PLAYAS CON UNA EXTENSIÓN MAYOR A 500,00 METROS CUADRADOS QUE HAYAN SIDO SURFEADAS POR
 MENOS DE 2 SURFISTAS.*/
 
+SELECT playas.*
+FROM playassurfistas INNER JOIN playas
+    ON playassurfistas.idPlaya = playas.id
+WHERE playas.extension > 500.00 
+GROUP BY playassurfistas.idPlaya
+HAVING COUNT(DISTINCT playassurfistas.idSurfista) < 2;
+
 /*7) HAZ QUE LOS SURFISTAS QUE HAYAN SURFEADO EN ALGUNA PLAYA CON OLA DE DIFICULTAD DIFICIL PASEN A SER DE CATEGORIA 
 SENIOR (USAD SUBCONSULTA).*/
 
+UPDATE surfistas
+SET categoria = "senior"
+WHERE id IN (
+    SELECT DISTINCT playassurfistas.idSurfista 
+    FROM playassurfistas INNER JOIN playas
+        ON playassurfistas.idPlaya = playas.id
+        INNER JOIN olas 
+        ON playas.id = olas.idPlaya
+    WHERE olas.dificultad LIKE "dificil"
+);
+
 /*8) BORRA EL REGISTRO DE AQUELLOS SURFISTAS CUYO APELLIDO EMPIECE POR “V” Y CUYA PENULTIMA LETRA SEA LA “E” TENIENDO EN CUENTA 
 QUE SU NOMBRE DEBE SUPERAR LOS 4 CARACTERES, EN CASO DE TENER UN NOMBRE DE 4 O MENOS CARACTERES, EL REGISTRO NO SERÁ BORRADO.*/
+
+DELETE
+FROM surfistas
+WHERE apellido LIKE "V%e_" AND CHAR_LENGTH(nombre) > 4;
