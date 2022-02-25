@@ -1,22 +1,32 @@
 /* 1. Calcula cuantos participantes jugaron algún torneo en Barcelona, mostrando el nombre de todos los torneos jugados por 
 los jugadores en una única columna.*/
 
-SELECT COUNT(DISTINCT torneosjugadores.idJugador) AS "Número de jugadores", torneos.nombre
+SELECT COUNT(DISTINCT torneosjugadores.idJugador) AS "Número de jugadores", GROUP_CONCAT(DISTINCT torneos.nombre) AS "Torneos"
 FROM torneosjugadores INNER JOIN torneos
     ON torneosjugadores.idTorneo = torneos.id
     INNER JOIN casino
     ON torneos.idCasino = casino.id
-WHERE casino.localidad = "Barcelona"
-GROUP BY torneos.nombre;
+WHERE casino.localidad = "Barcelona";
 
 -- 2. Devuelve el nombre de la ciudad que organizó algún torneo en el que no ha participado ningún jugador. --
 
 SELECT casino.localidad
 FROM casino INNER JOIN torneos      
     ON casino.id = torneos.idCasino
-    RIGHT JOIN torneosjugadores
+    LEFT JOIN torneosjugadores
     ON torneos.id = torneosjugadores.idTorneo
 WHERE torneosjugadores.idJugador IS NULL;
+
+-- Empezando por la otra tabla --
+
+SELECT casino.localidad
+FROM torneosjugadores RIGHT JOIN torneos 
+    ON torneosjugadores.idTorneo = torneos.id
+    INNER JOIN casino
+    ON torneos.idCasino = casino.id
+WHERE torneosjugadores.idJugador IS NULL;
+
+-- en el segundo join también podríamos utilizar un LEFT JOIN, pero lo más correcto sería usar el INNER JOIN --
 
 /* 3. Muestra el nombre del jugador, el nombre del torneo y el nombre de la modalidad favorita del jugador que ha jugado un 
 torneo con un premio mayor a la media de todos los torneos de nuestra base de datos.*/
@@ -76,7 +86,8 @@ como última una “s”. */
 SELECT jugadores.*
 FROM jugadores INNER JOIN torneosjugadores
     ON jugadores.id = torneosjugadores.idJugador
-WHERE jugadores.nombre LIKE "_e%s" AND
+WHERE jugadores.nombre LIKE "_e%s" 
+GROUP BY jugadores.nombre
 HAVING COUNT(DISTINCT torneosjugadores.idTorneo) = 3;
 
 -- 8. Muestra cuánto suman los premios de los torneos según la localidad en la que se celebren. --
