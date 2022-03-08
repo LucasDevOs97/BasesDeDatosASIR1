@@ -195,9 +195,28 @@ WHERE etapa.dorsal IS NULL;
 
 -- 25) Nombre de los ciclistas que no hayan ganado ningún puerto de montaña. --
 
--- no sé :') --
+-- Nombre los ciclistas que han ganado más de un puerto --
+
+SELECT nombre
+FROM ciclista
+WHERE dorsal NOT IN (
+    SELECT dorsal
+    FROM puerto
+);
 
 -- 26) Nombre de los ciclistas que hayan ganado más de un puerto de montaña. --
+
+SELECT DISTINCT ciclista.nombre
+FROM ciclista INNER JOIN puerto
+    ON ciclista.dorsal = puerto.dorsal
+    INNER JOIN etapa
+    ciclista.codigo = etapa.codigo
+    INNER JOIN llevar 
+    ON ciclista.codigo = llevar.codigo
+    INNER JOIN maillot
+    ON llevar.codigo = maillot.codigo
+WHERE maillot.tipo LIKE "montaña";
+
 -- 27) ¿Qué ciclistas han llevado el mismo maillot que Miguel Indurain? Subconsulta --
 
 SELECT ciclista.nombre
@@ -259,3 +278,34 @@ FROM ciclista INNER JOIN llevar
     INNER JOIN maillot
     ON llevar.codigo = maillot.codigo
 GROUP BY ciclista.nombre;
+
+/* 34) Obtener el número de etapa y el nombre de ciclista, tal que ese ciclista haya ganado esa etapa habiendo llevado el maillot de 
+color amarillo al menos una vez con anterioridad.*/
+
+SELECT etapa.netapa, ciclista.nombre
+FROM ciclista INNER JOIN etapa
+	ON ciclista.dorsal = etapa.dorsal
+    INNER JOIN llevar
+    ON etapa.netapa = llevar.netapa
+    INNER JOIN maillot
+    ON llevar.codigo = maillot.codigo
+WHERE maillot.color LIKE "amarillo"
+GROUP BY ciclista.nombre;
+
+/* 35) Obtener el valor del atributo netapa de las etapas que no comienzan en la misma ciudad en que acabó la anterior etapa.*/
+
+/* 36) Obtener el valor del atributo netapa y la ciudad de salida de aquellas etapas que no tengan puertos de montaña.*/
+
+/* 37)  Obtener la edad media de los ciclistas que han ganado alguna etapa. */
+
+/* 38) Selecciona el nombre de los puertos con una altura superior a la altura media de todos los puertos.*/
+
+SELECT nompuerto
+FROM puerto 
+WHERE altura > (
+    SELECT AVG(altura)
+    FROM puerto
+);
+
+/* 39) 9) Obtener el nombre de la ciudad de salida y de llegada de las etapas donde estén los puertos con mayor pendiente.*/
+
