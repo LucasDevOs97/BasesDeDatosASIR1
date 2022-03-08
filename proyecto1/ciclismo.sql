@@ -307,5 +307,25 @@ WHERE altura > (
     FROM puerto
 );
 
-/* 39) 9) Obtener el nombre de la ciudad de salida y de llegada de las etapas donde estén los puertos con mayor pendiente.*/
+/* 39) Obtener el nombre de la ciudad de salida y de llegada de las etapas donde estén los puertos con mayor pendiente.*/
+
+SELECT etapa.salida, etapa.llegada
+FROM puerto INNER JOIN etapa
+	ON puerto.netapa = etapa.netapa
+WHERE puerto.pendiente = (
+	SELECT MAX(puerto.pendiente)
+    FROM puerto
+);
+
+/* 40) Obtener el dorsal y el nombre de los ciclistas que han ganado los puertos de mayor altura. */
+
+SELECT ciclista.dorsal, ciclista.nombre
+FROM ciclista INNER JOIN puerto
+	ON ciclista.dorsal = puerto.dorsal
+WHERE puerto.altura = (
+	SELECT MAX(puerto.altura)
+    FROM puerto
+);
+
+/* 41)  Obtener el nombre del ciclista más joven que ha ganado al menos una etapa. */
 
