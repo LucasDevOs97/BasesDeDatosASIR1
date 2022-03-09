@@ -80,12 +80,25 @@ FROM ciclista INNER JOIN equipo
     ON ciclista.nomeq = equipo.nomeq
 WHERE equipo.nomeq LIKE "banesto";
 
+-- Corrección --
+
+SELECT nombre, nomeq 
+FROM ciclista
+WHERE nomeq LIKE "BAnesto";
+
 -- 12) ¿Cuántos ciclistas pertenecen al equipo Amore Vita? --
 
 SELECT COUNT(ciclista.dorsal) AS "Ciclistas del equipo Amore Vita"
 FROM ciclista INNER JOIN equipo
     ON ciclista.nomeq = equipo.nomeq
 WHERE equipo.nomeq LIKE "Amore Vita";
+
+
+-- Corrección --
+
+SELECT COUNT(*) AS "Ciclistas de Amore Vita"
+FROM ciclista
+WHERE nomeq LIKE "Amore Vita";
 
 -- 13) Edad media de los ciclistas del equipo TVM. --
 
@@ -94,9 +107,18 @@ FROM ciclista INNER JOIN equipo
     ON ciclista.nomeq = equipo.nomeq
 WHERE equipo.nomeq LIKE "TVM";
 
+-- Corrección --
+
+SELECT AVG(edad) AS "Media edad del equipo TVM"
+FROM ciclista
+WHERE nomeq LIKE "TVM";
+
 -- 14) Nombre de los ciclistas que pertenezcan al mismo equipo que Miguel Indurain (SIN SUBCONSULTA) --
 
-
+SELECT nombre
+FROM ciclista AS c1 INNER JOIN ciclista AS c2
+    ON c1.nomeq = c2.nomeq
+WHERE c2.nombre LIKE "Miguel Indurain" AND c1.nombre NOT LIKE "Miguel Indurain";
 
 -- 15) Nombre de los ciclistas que han ganado alguna etapa. --
 
@@ -109,17 +131,22 @@ FROM ciclista INNER JOIN etapa
     ON llevar.codigo = maillot.codigo
 GROUP BY ciclista.nombre;
 
+-- Corrección --
+
+SELECT DISTINCT ciclista.nombre
+FROM ciclista INNER JOIN etapa 
+    ciclista.dorsal = etapa.dorsal;
+
+-- Me da error en el phpMyAdmin --
+
 -- 16) Nombre de los ciclistas que han llevado el maillot General. -- -- -14, 16, 24, 25, 36 SIN SUBCONSULTA-
 
 SELECT ciclista.nombre
-FROM ciclista INNER JOIN etapa
-	ON ciclista.dorsal = etapa.dorsal
-    INNER JOIN llevar
-    ON etapa.netapa = llevar.netapa
+FROM ciclista INNER JOIN llevar
+    ON ciclista.dorsal = llevar.dorsal
     INNER JOIN maillot
     ON llevar.codigo = maillot.codigo
-WHERE maillot.tipo LIKE "General"
-GROUP BY ciclista.nombre;
+WHERE maillot.tipo LIKE "general";
 
 -- 17) Obtener el nombre del ciclista más joven -- -- 17, 27, 37, 38 SUBCONSULTA --
 
@@ -130,12 +157,29 @@ WHERE edad = (
     FROM ciclista
 );
 
+/* USANDO ALL. Se quedará solo con la edad que cumpla siempre la condición, en este caso menor o igual. Lo que hace es comparar la edad de cada
+ciclista con todos los registros de edades. Aquí el único que cumple que siempre es menor o igual es el 17
+*/
+
+SELECT nombre
+FROM ciclista
+WHERE edad <= ALL (
+    SELECT edad
+    FROM ciclista
+);
+
 -- 18) Obtener el número de ciclistas de cada equipo. --
 
 SELECT COUNT(ciclista.dorsal) AS "Número de ciclistas de cada equipo"
 FROM ciclista INNER JOIN equipo
 	ON ciclista.nomeq = equipo.nomeq
 GROUP BY equipo.nomeq;
+
+-- Corrección --
+
+SELECT COUNT(*) AS "Número de ciclsitas de cada equipo", nombre
+FROM ciclista
+GROUP BY nomeq;
 
 -- 19) Obtener el nombre de los equipos que tengan más de 5 ciclistas. --
 
@@ -145,32 +189,26 @@ FROM ciclista INNER JOIN equipo
 GROUP BY equipo.nomeq
 HAVING COUNT(ciclista.dorsal) > 5;
 
+-- Corrección --
+
+SELECT COUNT(*)
+FROM ciclista
+GROUP BY nomeq
+HAVING COUNT(*) > 5;
+
 -- 20) Obtener el número de puertos que ha ganado cada ciclista. --
 
-SELECT COUNT(puerto.nompuerto) AS "Número de puertos en los que ha ganado cada ciclista"
-FROM ciclista INNER JOIN puerto	
-	ON ciclista.dorsal = puerto.dorsal
-    INNER JOIN etapa
-    ON puerto.netapa = etapa.netapa
-    INNER JOIN llevar
-    ON etapa.netapa = llevar.netapa
-    INNER JOIN maillot
-    ON llevar.codigo = maillot.codigo
-GROUP BY ciclista.dorsal;
+SELECT COUNT(puerto.nompuerto) AS "Puertos que ha ganado cada ciclsita"
+FROM ciclista INNER JOIN puerto
+    ON ciclista.dorsal = puerto.dorsal
+GROUP BY cilista.dorsal;
 
 -- 21) Obtener el nombre de los ciclistas que han ganado más de un puerto. --
 
 SELECT ciclista.nombre
-FROM ciclista INNER JOIN puerto	
-	ON ciclista.dorsal = puerto.dorsal
-    INNER JOIN etapa
-    ON puerto.netapa = etapa.netapa
-    INNER JOIN llevar
-    ON etapa.netapa = llevar.netapa
-    INNER JOIN maillot
-    ON llevar.codigo = maillot.codigo
+FROM ciclista INNER JOIN puerto USING (dorsal)
 GROUP BY ciclista.dorsal
-HAVING COUNT(puerto.nompiuerto) > 1;
+HAVING COUNT(*) > 1;
 
 -- 22) Obtener el nombre y el director de los equipos a los que pertenezca algún ciclista mayor de 33 años. --
 
@@ -186,12 +224,20 @@ FROM equipo INNER JOIN ciclista
 	ON equipo.nomeq = ciclista.nomeq
 WHERE equipo.nomeq NOT LIKE "Kelme";
 
+-- Corrección --
+
+SELECT nombre
+FROM ciclista
+WHERE nomeq NOT LIKE "Kelme";
+
 -- 24) Nombre de los ciclistas que no hayan ganado ninguna etapa. --
 
 SELECT ciclista.nombre
 FROM ciclista LEFT JOIN etapa
 	ON ciclista.dorsal = etapa.dorsal
 WHERE etapa.dorsal IS NULL;
+
+-- nos quedamos aquí corrigiendo -- 
 
 -- 25) Nombre de los ciclistas que no hayan ganado ningún puerto de montaña. --
 
