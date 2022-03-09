@@ -232,12 +232,10 @@ WHERE nomeq NOT LIKE "Kelme";
 
 -- 24) Nombre de los ciclistas que no hayan ganado ninguna etapa. --
 
-SELECT ciclista.nombre
+SELECT DISTINCT ciclista.nombre
 FROM ciclista LEFT JOIN etapa
 	ON ciclista.dorsal = etapa.dorsal
 WHERE etapa.dorsal IS NULL;
-
--- nos quedamos aquí corrigiendo -- 
 
 -- 25) Nombre de los ciclistas que no hayan ganado ningún puerto de montaña. --
 
@@ -249,6 +247,13 @@ WHERE dorsal NOT IN (
     SELECT dorsal
     FROM puerto
 );
+
+-- Solución --
+
+SELECT ciclista.nombre
+FROM ciclista LEFT JOIN puerto
+    ON ciclista.dorsal = puerto.dorsal
+WHERE puerto.dorsal IS NULL;
 
 -- 26) Nombre de los ciclistas que hayan ganado más de un puerto de montaña. --
 
@@ -262,6 +267,14 @@ FROM ciclista INNER JOIN puerto
     INNER JOIN maillot
     ON llevar.codigo = maillot.codigo
 WHERE maillot.tipo LIKE "montaña";
+
+-- Corrección --
+
+SELECT COUNT(*) AS "Número de ciclistas", ciclista.nombre
+FROM ciclista INNER JOIN puerto
+    ON ciclista.dorsal = puerto.dorsal
+GROUP BY ciclista.dorsal
+HAVING COUNT(*) > 1;
 
 -- 27) ¿Qué ciclistas han llevado el mismo maillot que Miguel Indurain? Subconsulta --
 
@@ -280,6 +293,18 @@ WHERE maillot.tipo IN (
 	GROUP BY maillot.tipo
 ) AND ciclista.nombre NOT LIKE "Miguel indurain";
 
+-- Otra forma --
+
+SELECT ciclista.nombre
+FROM ciclista INNER JOIN llevar
+    ON ciclista.dorsal = llevar.dorsal
+WHERE llevar.codigo IN (
+    SELECT llevar.codigo
+    FROM ciclista INNER JOIN llevar
+        ON ciclista.dorsal = llevar.dorsal
+    WHERE ciclista.nombre LIKE "Miguel Indurain"
+) AND ciclista.nombre NOT LIKE "Miguel Indurain";
+
 -- 28) De cada equipo obtener la edad media, la máxima edad y la mínima edad. --
 
 SELECT equipo.nomeq, MIN(ciclista.edad) AS "EDAD MÍNIMA", MAX(ciclista.edad) AS "EDAD MÁXIMA", AVG(ciclista.edad) AS "EDAD MEDIA"
@@ -287,12 +312,24 @@ FROM equipo INNER JOIN ciclista
 	ON equipo.nomeq = ciclista.nomeq
 GROUP BY equipo.nomeq;
 
+-- Corrección --
+
+SELECT nomeq, MIN(ciclista.edad) AS "EDAD MÍNIMA", MAX(ciclista.edad) AS "EDAD MÁXIMA", AVG(ciclista.edad) AS "EDAD MEDIA"
+FROM ciclista 
+GROUP BY nomeq;
+
 -- 29) Nombre de aquellos ciclistas que tengan una edad entre 25 y 30 años y que no pertenezcan a los equipos Kelme y Banesto. --
 
 SELECT ciclista.nombre
 FROM equipo INNER JOIN ciclista
 	ON equipo.nomeq = ciclista.nomeq
 WHERE ciclista.edad BETWEEN 25 AND 30 AND equipo.nomeq NOT IN ("Kelme", "Banesto");
+
+-- Corrección --
+
+SELECT nombre
+FROM ciclista
+WHERE edad BETWEEN 25 AND 30 AND nomeq NOT IN ("Kelme", "Banesto");
 
 -- 30) Nombre de los ciclistas que han ganado la etapa que comienza en Zamora. --
 
@@ -304,15 +341,13 @@ WHERE etapa.salida LIKE "Zamora";
 -- 31) Obtén el nombre y la categoría de los puertos ganados por ciclistas del equipo 'Banesto'. --
 
 SELECT puerto.nompuerto, puerto.categoria
-FROM equipo INNER JOIN ciclista
-	ON equipo.nomeq = ciclista.nomeq
-    INNER JOIN puerto
+FROM equipo INNER JOIN puerto
     ON ciclista.dorsal = puerto.dorsal
-WHERE equipo.nomeq LIKE "Banesto";
+WHERE ciclista.nomeq LIKE "Banesto";
 
 -- 32) Obtener el nombre de cada puerto indicando el número (netapa) y los kilómetros de la etapa en la que se encuentra el puerto. --
 
-SELECT etapa.netapa, etapa.km
+SELECT puerto.nompuerto, etapa.netapa, etapa.km
 FROM puerto INNER JOIN etapa
 	ON puerto.netapa = etapa.netapa;
 
@@ -325,24 +360,28 @@ FROM ciclista INNER JOIN llevar
     ON llevar.codigo = maillot.codigo
 GROUP BY ciclista.nombre;
 
-/* 34) Obtener el número de etapa y el nombre de ciclista, tal que ese ciclista haya ganado esa etapa habiendo llevado el maillot de 
-color amarillo al menos una vez con anterioridad.*/
-
-SELECT etapa.netapa, ciclista.nombre
-FROM ciclista INNER JOIN etapa
-	ON ciclista.dorsal = etapa.dorsal
-    INNER JOIN llevar
-    ON etapa.netapa = llevar.netapa
-    INNER JOIN maillot
-    ON llevar.codigo = maillot.codigo
-WHERE maillot.color LIKE "amarillo"
-GROUP BY ciclista.nombre;
-
-/* 35) Obtener el valor del atributo netapa de las etapas que no comienzan en la misma ciudad en que acabó la anterior etapa.*/
-
 /* 36) Obtener el valor del atributo netapa y la ciudad de salida de aquellas etapas que no tengan puertos de montaña.*/
 
+SELECT etapa.netapa, etapa.salida
+FROM etapa LEFT JOIN puerto
+    ON etapa.netapa = puerto.netapa
+WHERE puerto.netapa IS NULL;
+
 /* 37)  Obtener la edad media de los ciclistas que han ganado alguna etapa. */
+
+SELECT AVG(DISTINCT ciclista.edad) AS "Edad media"
+FROM ciclista INNER JOIN etapa
+    ON ciclista.dorsal = etapa.dorsal;
+
+-- Con subconsulta --
+
+SELECT AVG(edad)
+FROM ciclista 
+WHERE ciclista.dorsal IN (
+    SELECT dorsal
+    FROM ciclista INNER JOIN etapa
+        ON ciclista.dorsal = etapa.dorsal
+)
 
 /* 38) Selecciona el nombre de los puertos con una altura superior a la altura media de todos los puertos.*/
 
@@ -352,6 +391,8 @@ WHERE altura > (
     SELECT AVG(altura)
     FROM puerto
 );
+
+-- Última que corregimos: 38 --
 
 /* 39) Obtener el nombre de la ciudad de salida y de llegada de las etapas donde estén los puertos con mayor pendiente.*/
 
