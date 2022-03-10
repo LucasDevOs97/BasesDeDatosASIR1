@@ -72,6 +72,15 @@ WHERE id IN (
     WHERE torneosjugadores.idJugador IS NULL
 );
 
+/*si se usa como servidor MYSQL, TENEMOS QUE TENER EN CUENTA QUE CON LA ÚLTIMA VERSIÓN
+NO SE PUEDEN USAR SUBCONSULTAS EN LOS DELETES Y UPDATES
+*/
+
+DELETE torneos.*
+FROM torneos LEFT JOIN torneosjugadores 
+    ON torneos.id = torneosjugadores.idTorneo
+WHERE torneosjugadores.idJugador IS NULL;
+
 -- 6. Muestra la información de aquellos jugadores que hayan participado en más de 1 torneo. --
 
 SELECT jugadores.*
