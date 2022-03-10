@@ -414,5 +414,43 @@ WHERE puerto.altura = (
     FROM puerto
 );
 
-/* 41)  Obtener el nombre del ciclista más joven que ha ganado al menos una etapa. */
+/* 41) Obtener el nombre del ciclista más joven que ha ganado al menos una etapa. */
+
+
+
+/* 42) Obtener el valor del atributo netapa de aquellas etapas tales que todos los puertos que están en ellas tienen al menos 2500 metros de altura.*/
+
+SELECT DISTINCT netapa
+FROM puerto
+WHERE altura >= 2500;
+
+SELECT DISTINCT etapa.netapa
+FROM etapa INNER JOIN puerto 
+    ON etapa.netapa = puerto.netapa
+WHERE puerto.altura >= 2500;
+
+-- 43) Obtener el nombre y el director de los equipos tales que todos sus ciclistas son mayores de 20 años.
+
+SELECT equipo.nomeq, equipo.director
+FROM equipo INNER JOIN ciclista
+	ON equipo.nomeq = ciclista.nomeq
+WHERE ciclista.edad > 20;
+
+/* 44) Obtener el dorsal y el nombre de los ciclistas tales que todas las etapas que han ganado tienen al menos 150 km (es decir que sólo han ganado etapas de 
+más o igual a 150 km).*/
+
+SELECT DISTINCT ciclista.dorsal, ciclista.nombre
+FROM ciclista INNER JOIN etapa
+	ON ciclista.dorsal = etapa.dorsal
+WHERE etapa.km >= 150;
+
+-- 45) Obtener el nombre de los ciclistas que han ganado una etapa y algún puerto de esa misma etapa.
+
+SELECT DISTINCT ciclista.nombre
+FROM ciclista INNER JOIN etapa
+	ON ciclista.dorsal = etapa.dorsal
+    INNER JOIN puerto 
+    ON etapa.netapa = puerto.netapa;
+
+-- 46) Obtener el nombre de los equipos tales que todos sus corredores han llevado algún maillot o han ganado algún puerto. (ninguno lo comple)
 
