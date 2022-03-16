@@ -476,7 +476,15 @@ FROM ciclista INNER JOIN etapa
 	ON ciclista.dorsal = etapa.dorsal
 WHERE etapa.km >= 150;
 
---REPETIR PARA MAÑANA--
+--Corrección--
+
+SELECT *
+FROM ciclista INNER JOIN etapa USING (dorsal)
+WHERE ciclista.dorsal NOT IN (
+    SELECT dorsal
+    FROM etapa
+    WHERE km < 150
+);
 
 -- 45) Obtener el nombre de los ciclistas que han ganado una etapa y algún puerto de esa misma etapa.
 

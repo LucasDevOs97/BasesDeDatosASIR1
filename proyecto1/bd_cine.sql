@@ -112,15 +112,83 @@ WHERE directores.director IN (
 
 /* 4) Películas dirigidas por Billy Wilder donde hayan actuado Marilyn Monroe o Jack Lemmon */
 
+SELECT directores_peliculas.titulo, directores_peliculas.produccion, actores.actor
+FROM directores_peliculas INNER JOIN directores 
+	ON directores_peliculas.director_id = directores.id
+    INNER JOIN actores_peliculas
+    ON actores_peliculas.pelicula_id = directores_peliculas.pelicula_id
+    INNER JOIN actores
+    ON actores_peliculas.actor_id = actores.id
+WHERE directores.director LIKE "Billy Wilder" AND actores.actor IN ("Marilyn Monroe", "Jack Lemmon")
+ORDER BY directores_peliculas.titulo, actores.actor;
 
+-- Otra forma --
 
-/* 5) Géneros de película preferidos del director John Ford */
+SELECT peliculas.titulo, peliculas.produccion, actores.actor
+FROM peliculas 
+  INNER JOIN directores_peliculas 
+  	ON peliculas.id = directores_peliculas.pelicula_id
+    INNER JOIN directores
+    ON directores_peliculas.director_id = directores.id
+  INNER JOIN actores_peliculas 
+  ON actores_peliculas.pelicula_id = peliculas.id
+  INNER JOIN actores 
+  ON actores_peliculas.actor_id = actores.id
+WHERE directores.director = 'Billy Wilder' 
+  AND actores.actor IN ('Marilyn Monroe','Jack Lemmon')
+ORDER BY peliculas.titulo, actores.actor
+
+-- Películas dirigidas por Billy Wilder --
+/*SELECT *
+FROM directores_peliculas INNER JOIN directores 
+	ON directores_peliculas.director_id = directores.id
+WHERE directores.director LIKE "Billy Wilder";*/
+
+-- Películas en las que actúan Marilyn Monroe o Jasck Lemmon --
+/*SELECT *
+FROM actores_peliculas INNER JOIN actores
+	ON actores_peliculas.actor_id = actores.id
+WHERE actores.actor IN ("Marilyn Monroe", "Jack Lemmon");*/
+
+/* 5) Géneros de película preferidos del director John Ford (Contar cuantas películas de cada género ha hecho Jhon Ford)*/
+SELECT COUNT(*) AS "Número de películas de ese género", generos.genero
+FROM generos INNER JOIN generos_peliculas
+	ON generos.id = generos_peliculas.genero_id
+    INNER JOIN directores_peliculas
+    ON generos_peliculas.pelicula_id = directores_peliculas.pelicula_id
+    INNER JOIN directores
+    ON directores_peliculas.director_id = directores.id
+WHERE directores.director LIKE "John Ford"
+GROUP BY generos.genero
+ORDER BY COUNT(*) DESC;
 
 /* 6) Películas de animación o dibujos animados ordenadas de más a menos reciente */
 
+SELECT generos_peliculas.titulo, generos_peliculas.produccion, generos.genero
+FROM generos_peliculas INNER JOIN generos
+	ON generos_peliculas.genero_id = generos.id
+WHERE generos.genero IN ("Animacion", "Dibujos Animados")
+ORDER BY generos_peliculas.produccion DESC;
+
 /* 7) Películas dónde actúan "Cary Grant" y "Ingrid Bergman" */
 
+SELECT actores_peliculas.titulo, actores_peliculas.produccion
+FROM actores INNER JOIN actores_peliculas
+	ON actores.id = actores_peliculas.actor_id
+WHERE actores.actor = "Ingrid Bergman" AND actores_peliculas.titulo IN (
+	SELECT actores_peliculas.titulo
+    FROM actores INNER JOIN actores_peliculas
+        ON actores.id = actores_peliculas.actor_id
+    WHERE actores.actor = "Cary Grant"
+);
+
 /* 8) Películas y actores del año 1982 */
+
+SELECT actores_peliculas.titulo, GROUP_CONCAT(actores.actor) AS "actores"
+FROM actores_peliculas INNER JOIN actores
+	ON actores_peliculas.actor_id = actores.id
+WHERE actores_peliculas.produccion = 1982
+GROUP BY actores_peliculas.titulo;
 
 /* 9) Películas y actores de la década de los 90 con al menos 2 directores */
 
